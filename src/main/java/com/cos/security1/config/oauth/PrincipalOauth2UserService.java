@@ -1,6 +1,9 @@
 package com.cos.security1.config.oauth;
 
 import com.cos.security1.auth.PrincipalDetails;
+import com.cos.security1.config.oauth.provider.FacebookUserInfo;
+import com.cos.security1.config.oauth.provider.GoogleUserInfo;
+import com.cos.security1.config.oauth.provider.OAuth2UserInfo;
 import com.cos.security1.model.User;
 import com.cos.security1.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,10 +37,24 @@ public class PrincipalOauth2UserService extends DefaultOAuth2UserService {
 
         System.out.println("oAuth2User " + oAuth2User.getAttributes());
 
+        OAuth2UserInfo oAuth2UserInfo = null;
+
+        if (userRequest.getClientRegistration().getRegistrationId().equals("google")) {
+            System.out.println("구글 로그인 요청");
+            oAuth2UserInfo = new GoogleUserInfo(oAuth2User.getAttributes());
+        }
+        else if (userRequest.getClientRegistration().getRegistrationId().equals("facebook")) {
+            System.out.println("페이스북 로그인 요청");
+            oAuth2UserInfo = new FacebookUserInfo(oAuth2User.getAttributes());
+        }
+        else {
+            System.out.println("우리는 구글과 페이스북만 지원해요");
+        }
+
         // 강제 회원가입 진행
-        String provider = userRequest.getClientRegistration().getClientId(); // google
-        String providerId = oAuth2User.getAttribute("sub"); // google 의 id
-        String email = oAuth2User.getAttribute("email");
+        String provider = oAuth2UserInfo.getProvider(); // google
+        String providerId = oAuth2UserInfo.getProviderId(); // google 의 id
+        String email = oAuth2UserInfo.getEmail();
         String username = provider + "_" + providerId; // google_123123123, 충돌 방지를 위해
         String password = bCryptPasswordEncoder.encode("겟인데어");
         String role = "ROLE_USER";
