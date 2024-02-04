@@ -29,8 +29,9 @@ public class SecurityConfig {
                 .anyRequest().permitAll() // 나머지는 권한 필요 없음
                 .and()
                 .formLogin()
-                .loginPage("/loginForm"); // 스프링 시큐리티가 해당 주소로 요청이 오는 로그인을 가로채서 대신 로그인 페이지를 보여줌
-
+                .loginPage("/loginForm") // 스프링 시큐리티가 해당 주소로 요청이 오는 로그인을 가로채서 대신 로그인 페이지를 보여줌
+                .loginProcessingUrl("/login") // login 주소가 호출이 되면 시큐리티가 낚아채서 대신 로그인을 진행해 줍니다.
+                .defaultSuccessUrl("/"); // 로그인이 성공하면 해당 주소로 이동
         return http.build();
 
     }
